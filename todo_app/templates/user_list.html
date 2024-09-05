@@ -3,16 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>User List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            background-color: #0111f3;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(53, 21, 212, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
 </head>
 <body>
-    <!-- user_list.html -->
-    <h1>User List</h1>
-    <ul>
-    {% for user in object_list %}
-        <li>{{ user.username }}</li>
-    {% endfor %}
-    </ul>
-
+    <div class="container">
+        <h1>User List</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Created By</th>
+                    <th>Assigned To</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in object_list %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            <ul>
+                                {% for task in tasks %}
+                                    {% if task.created_by == user %}
+                                        <li>{{ task.title }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for task in tasks %}
+                                    {% if task.assigned_to == user %}
+                                        <li>{{ task.title }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
