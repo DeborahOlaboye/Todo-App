@@ -19,29 +19,26 @@ def index(request):
     return render(request, "index.html",{})
 
 
-# @login_required
-# def task_lists(request):
-#     if request.user.is_superuser:
-#         tasks = Task.objects.all().order_by("-created")
-#     # Handles the display of tasks to the logged-in user.
-#     # The user will only see tasks that are either assigned to them or created by them.
-#     else:
-#         tasks = (Task.objects.filter(assigned_to=request.user) | Task.objects.filter(created_by=request.user)).distinct().order_by("-created")
-#     return render(request, "task_list.html", {"tasks": tasks})
+@login_required
+def task_lists(request):
+    if request.user.is_superuser:
+        tasks = Task.objects.all().order_by("-created")
+    # Handles the display of tasks to the logged-in user.
+    # The user will only see tasks that are either assigned to them or created by them.
+    else:
+        tasks = (Task.objects.filter(assigned_to=request.user) | Task.objects.filter(created_by=request.user)).distinct().order_by("-created")
+    return render(request, "task_list.html", {"tasks": tasks})
 
-class TaskList(ListView, LoginRequiredMixin):
-    model = Task
-    form_class = TaskForm
-    template_name = "task_list.html"
+# class TaskList(ListView, LoginRequiredMixin):
+#     model = Task
+#     template_name = "task_list.html"
 
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Task.objects.all().order_by("-created")
-        else:
-            return Task.objects.filter(assigned_to=self.request.user) | Task.objects.filter(created_by=self.request.user).distinct().order_by("-created")
+#     def get_queryset(self):
+#         if self.request.user.is_superuser:
+#             return Task.objects.all().order_by("-created")
+#         else:
+#             return Task.objects.filter(assigned_to=self.request.user) | Task.objects.filter(created_by=self.request.user).distinct().order_by("-created")
     
-    def get_success_url(self):
-        return reverse("tasks")
     
 class UserList(ListView, LoginRequiredMixin, UserPassesTestMixin):
     model = User
@@ -53,7 +50,7 @@ class UserList(ListView, LoginRequiredMixin, UserPassesTestMixin):
 
     
 
-class CreateTaskView(CreateView, LoginRequiredMixin, UserPassesTestMixin):
+class CreateTaskView(LoginRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm
     template_name = "create_task.html"
@@ -65,8 +62,8 @@ class CreateTaskView(CreateView, LoginRequiredMixin, UserPassesTestMixin):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
     
-    def test_func(self):
-        return self.request.user.is_superuser
+    # def test_func(self):
+    #     return self.request.user.is_superuser
 # @login_required
 # def create_task(request):
 #     if request.method == 'POST':
@@ -99,7 +96,7 @@ class CreateTaskView(CreateView, LoginRequiredMixin, UserPassesTestMixin):
 #         form = TaskForm(instance=task)
 #     return render(request, 'task_update.html', {"form": form})
 
-class TaskUpdateView(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
+class TaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = "task_update.html"
